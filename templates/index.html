@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lung Cancer Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const regressionOrClassificationSelect = document.getElementById('regression_classification');
+            const modelSelect = document.getElementById('model');
+    
+            if (!regressionOrClassificationSelect || !modelSelect) {
+                console.error('Required elements not found in the DOM.');
+                return;
+            }
+    
+            // Function to update model options based on the selection
+            function updateModelOptions() {
+                const regressionOrClassification = regressionOrClassificationSelect.value;
+    
+                if (regressionOrClassification === 'regression') {
+                    modelSelect.innerHTML = `
+                        <option value="logistic_regression">Logistic Regression</option>
+                        <option value="randomforest_regressor">RandomForest Regressor</option>
+                        <option value="decisiontree_regressor">Decision Tree Regressor</option>
+                        <option value="svr">SVR</option>`;
+                } else if (regressionOrClassification === 'classification') {
+                    modelSelect.innerHTML = `
+                        <option value="randomforest_classifier">RandomForest Classifier</option>
+                        <option value="decisiontree_classifier">Decision Tree Classifier</option>
+                        <option value="svc">SVC</option>`;
+                }
+            }
+    
+            // Attach change event listener to the regression/classification selector
+            regressionOrClassificationSelect.addEventListener('change', updateModelOptions);
+    
+            // Initial update to set options based on the default selection
+            updateModelOptions();
+        });
+    </script>
+        
+</head>
+<body class="bg-gray-100 min-h-screen flex justify-center items-center">
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-700 mb-6">Lung Cancer Prediction</h1>
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Problem Type Selection -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Problem Type</h2>
+                    <select id="regression_classification" name="regression_classification" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" onchange="updateModelOptions()" required>
+                        <option value="regression">Regression</option>
+                        <option value="classification">Classification</option>
+                    </select>
+                </div>
+                <!-- Model Selection Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Select Model</h2>
+                    <select id="model" name="model" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="logistic">Logistic Regression</option>
+                        <option value="randomforest">Random Forest</option>
+                        <option value="decisiontree">Decision Tree</option>
+                        <option value="svm">Support Vector Machine</option> <!-- Adding SVM as the new model -->
+                    </select>
+                </div>
+
+                <!-- Gender Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Gender</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="gender" value="Male" class="text-blue-600" required>
+                            <span class="text-gray-600">Male</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="gender" value="Female" class="text-blue-600" required>
+                            <span class="text-gray-600">Female</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Age Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Age</h2>
+                    <input type="number" name="age" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Smoking Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Smoking</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="smoking" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="smoking" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Yellow Fingers Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Yellow Fingers</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="yellow_fii" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="yellow_fii" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Anxiety Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Anxiety</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="anxiety" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="anxiety" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Peer Pressure Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Peer Pressure</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="peer_pres" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="peer_pres" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Chronic Disease Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Chronic Disease</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="chronic_d" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="chronic_d" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Fatigue Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Fatigue</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="fatigue" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="fatigue" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Allergy Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Allergy</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="allergy" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="allergy" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Wheezing Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Wheezing</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="wheezing" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="wheezing" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Alcohol Consumption Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Alcohol Consumption</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="alcohol_c" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="alcohol_c" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Coughing Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Coughing</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="coughing" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="coughing" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Shortness of Breath Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Shortness of Breath</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="shortness_s" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="shortness_s" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Swallowing Difficulty Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Swallowing Difficulty</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="swallowi" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="swallowi" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Chest Pain Card -->
+                <div class="p-6 bg-gray-50 border rounded-lg shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Chest Pain</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="chest_pain" value="Yes" class="text-blue-600" required>
+                            <span class="text-gray-600">Yes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="chest_pain" value="No" class="text-blue-600" required>
+                            <span class="text-gray-600">No</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300">Predict</button>
+            </div>
+        </form>
+
+        {% if prediction_percentage is not none %}
+            <h2 class="text-2xl font-bold text-center text-gray-700 mt-6">Probability of Lung Cancer: {{ prediction_percentage }}%</h2>
+        {% endif %}
+    </div>
+</body>
+</html>
